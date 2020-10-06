@@ -2,6 +2,24 @@
 
 const Glue = require('@hapi/glue');
 const Manifest = require('./manifest');
+const v8Profiler = require('v8-profiler-next');
+const fs = require('fs');
+
+/**
+ * Take CPU Profile
+ */
+const title = 'realworld-hapipal';
+// example 1 minute cpu profile
+console.log('Start profiling on app ' + title);
+v8Profiler.startProfiling(title, true);
+setTimeout(() => {
+  const profile = v8Profiler.stopProfiling(title);
+  profile.export(function (error, result) {
+    fs.writeFileSync(`${title}.cpuprofile`, result);
+    console.log('Stop profiling on app ' + title);
+    profile.delete();
+  });
+}, 1 * 60 * 1000);
 
 exports.deployment = async (start) => {
 
